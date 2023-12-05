@@ -256,6 +256,7 @@ columns_to_extract = ['Name', 'Number of nuclei',
                       'Min diameter µm', 'Nuclei diameter µm: Mean Min', 'Diameter Ratio %: Min'
                       'Max diameter µm', 'Nuclei diameter µm: Mean Max', 'Diameter Ratio %: Max',
                       'Circularity', 'Nuclei Circularity µm: Mean', 'Circularity Ratio %',
+                      'Hematoxylin: Mean', 'Hematoxylin: Min', 'Hematoxylin: Max',
                       'Nuclei Hematoxylin: Max', 'Nuclei Hematoxylin: Min', 'Nuclei Hematoxylin: Mean', 'Nuclei Hematoxylin: Std.Dev.'
                       ]
 
