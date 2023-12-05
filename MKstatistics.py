@@ -1,5 +1,28 @@
 """
+Megakaryocyte Statistics Script
+
 Author: Lilly-Flore CELMA
+
+This script analyzes measurements from a TSV file containing megakaryocyte (MK) data. It generates statistical
+histograms and tables, and combines them into a final PDF report. The analysis includes various parameters such as
+the number of nuclei, area, diameter, circularity, and hematoxylin values.
+
+1. Load Data:
+   - Reads the measurements TSV file into a pandas DataFrame.
+
+2. Generate Histograms:
+   - Produces histograms for different MK and nuclei parameters, such as number, area, diameter, circularity, and hematoxylin.
+
+3. Create Tables:
+   - Computes and creates tables with summary statistics for MK and nuclei parameters.
+
+4. Combine Histograms and Tables:
+   - Merges the generated histograms and tables into separate PDFs.
+
+5. Generate Final Report:
+   - Combines the histograms and tables PDFs into a single comprehensive report.
+
+Note: Exception handling is implemented for potential errors during file reading, data processing, and PDF creation.
 """
 import PyPDF2
 import numpy as np
