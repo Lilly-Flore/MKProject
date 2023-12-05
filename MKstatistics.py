@@ -339,9 +339,9 @@ tables.append(mean_area_table)
 std_area_table = create_table('MK area std', 'Nuclei area std', f"{round(np.std(area_list), 2)} (µm^2)", f"{round(np.std(nuc_area_list), 2)} (µm^2)")
 tables.append(std_area_table)
 
-mean_max_diam_table = create_table('MK mean max diameter', 'Nuclei mean max diameter', f"{round(np.mean(max_diameter_list), 2)} (µm)", f"{round(np.mean(nuc_max_diam_list), 2)}")
+mean_max_diam_table = create_table('MK mean max diameter', 'Nuclei mean max diameter', f"{round(np.mean(max_diameter_list), 2)} (µm)", f"{round(np.mean(nuc_max_diam_list), 2)} (µm)")
 tables.append(mean_max_diam_table)
-std_max_diam_table = create_table('MK max diameter std', 'Nuclei max diameter std', f"{round(np.std(max_diameter_list), 2)} (µm)", f"{round(np.std(nuc_max_diam_list), 2)}")
+std_max_diam_table = create_table('MK max diameter std', 'Nuclei max diameter std', f"{round(np.std(max_diameter_list), 2)} (µm)", f"{round(np.std(nuc_max_diam_list), 2)} (µm)")
 tables.append(std_max_diam_table)
 
 mean_min_diam_table = create_table('MK mean min diameter', 'Nuclei mean min diameter', f"{round(np.mean(min_diameter_list), 2)} (µm)", f"{round(np.mean(nuc_min_diam_list), 2)} (µm)")
