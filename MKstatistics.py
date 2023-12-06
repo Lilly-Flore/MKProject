@@ -46,7 +46,7 @@ except pd.errors.EmptyDataError:
 except pd.errors.ParserError:
     print(f"Error: There was an issue parsing the TSV file {measurements_file_tsv}.")
 
-################################### CREATE STATISTICS HISTOGRAM ########################################
+################################### CREATE STATISTICS HISTOGRAM #####################################
 def extract_unit_scientific_notation(number):
     """
     Extracts the unit from a number in scientific notation.
