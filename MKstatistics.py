@@ -33,7 +33,7 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
 from reportlab.lib.pagesizes import letter
 
-######################################## GET TSV FILE ########################################
+######################################## GET TSV FILE ###########################################
 # Load the TSV file into a pandas DataFrame, specifying the delimiter
 measurements_file_tsv = '/Users/lilly-flore/Desktop/Bachelor_Project/MKProject/measurements.tsv'
 
