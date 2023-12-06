@@ -251,7 +251,7 @@ def merge_pdfs(pdf1_path, pdf2_path, o_path):
 
 ################################### INITIATE VALUES ########################################
 
-columns_to_extract = ['Name', 'Number of nuclei',
+columns_to_extract = ['Object ID','Name', 'Number of nuclei',
                       'Area µm^2', 'Area Ratio %', 'Nuclei Area µm^2: Mean',
                       'Min diameter µm', 'Nuclei diameter µm: Mean Min', 'Diameter Ratio %: Min'
                       'Max diameter µm', 'Nuclei diameter µm: Mean Max', 'Diameter Ratio %: Max',
@@ -280,10 +280,14 @@ circularity_list = df['Circularity'].tolist()
 nuc_circ_list = df['Nuclei Circularity µm: Mean'].tolist()
 circ_ratio_list = df['Circularity Ratio %'].tolist()
 
-min_hema_list = df['Nuclei Hematoxylin: Min'].tolist()
-max_hema_list = df['Nuclei Hematoxylin: Max'].tolist()
-mean_hema_list = df['Nuclei Hematoxylin: Mean'].tolist()
-std_hema_list = df['Nuclei Hematoxylin: Std.Dev.'].tolist()
+
+min_hema_list = df['Hematoxylin: Min'].tolist()
+max_hema_list = df['Hematoxylin: Max'].tolist()
+mean_hema_list = df['Hematoxylin: Mean'].tolist()
+nuc_min_hema_list = df['Nuclei Hematoxylin: Min'].tolist()
+nuc_max_hema_list = df['Nuclei Hematoxylin: Max'].tolist()
+nuc_mean_hema_list = df['Nuclei Hematoxylin: Mean'].tolist()
+nuc_std_hema_list = df['Nuclei Hematoxylin: Std.Dev.'].tolist()
 
 # Create pdf file
 graphs_pdf = "Graphs.pdf"
@@ -320,14 +324,21 @@ with PdfPages(graphs_pdf) as pdf:
     circ_ratio_fig = plot_histogram(circ_ratio_list, 'Circularity Ratio %', 'Number of Megakaryocytes')
     pdf.savefig(circ_ratio_fig)
 
-    min_hema_fig = plot_histogram(min_hema_list, 'Hematoxylin: Min', 'Number of Nuclei')
+    min_hema_fig = plot_histogram(min_hema_list, 'Hematoxylin: Min', 'Number of Megakaryocytes')
     pdf.savefig(min_hema_fig)
-    max_hema_fig = plot_histogram(max_hema_list, 'Hematoxylin: Max', 'Number of Nuclei')
+    max_hema_fig = plot_histogram(max_hema_list, 'Hematoxylin: Max', 'Number of Megakaryocytes')
     pdf.savefig(max_hema_fig)
-    mean_hema_fig = plot_histogram(mean_hema_list, 'Hematoxylin: Mean', 'Number of Nuclei')
+    mean_hema_fig = plot_histogram(mean_hema_list, 'Hematoxylin: Mean', 'Number of Megakaryocytes')
     pdf.savefig(mean_hema_fig)
-    std_hema_fig = plot_histogram(std_hema_list, 'Hematoxylin: Std.Dev.', 'Number of Nuclei')
-    pdf.savefig(std_hema_fig)
+
+    nuc_min_hema_fig = plot_histogram(nuc_min_hema_list, 'Hematoxylin: Min', 'Number of Nuclei')
+    pdf.savefig(nuc_min_hema_fig)
+    nuc_max_hema_fig = plot_histogram(nuc_max_hema_list, 'Hematoxylin: Max', 'Number of Nuclei')
+    pdf.savefig(nuc_max_hema_fig)
+    nuc_mean_hema_fig = plot_histogram(nuc_mean_hema_list, 'Hematoxylin: Mean', 'Number of Nuclei')
+    pdf.savefig(nuc_mean_hema_fig)
+    nuc_std_hema_fig = plot_histogram(nuc_std_hema_list, 'Hematoxylin: Std.Dev.', 'Number of Nuclei')
+    pdf.savefig(nuc_std_hema_fig)
 
 tables_pdf = "Tables.pdf"
 tables = []
@@ -355,12 +366,13 @@ tables.append(mean_circularity_table)
 std_circularity_table = create_table('MK circularity std', 'Nuclei circularity std', f"{round(np.std(circularity_list), 2)} (µm)", f"{round(np.std(nuc_circ_list), 2)} (µm)")
 tables.append(std_circularity_table)
 
-mean_hema_table = create_table('Nuclei mean hematoxylin', 'Nuclei hematoxylin std', f"{round(np.mean(mean_hema_list), 2)}", f"{round(np.mean(std_hema_list), 2)}")
+mean_hema_table = create_table('MK mean hematoxylin', 'Nuclei mean hematoxylin', f"{round(np.mean(mean_hema_list), 2)}", f"{round(np.mean(nuc_mean_hema_list), 2)}")
+tables.append(mean_hema_table)
+mean_hema_table = create_table('MK hematoxylin std', 'Nuclei hematoxylin std', f"{round(np.std(mean_hema_list), 2)}", f"{round(np.mean(nuc_std_hema_list), 2)}")
 tables.append(mean_hema_table)
 
 # Create the PDF with multiple tables
 create_pdf_with_tables(tables_pdf, tables)
-
 
 # Merge graph pdf and table pdf
 output_path = '/Users/lilly-flore/Desktop/MK_statistics.pdf'
