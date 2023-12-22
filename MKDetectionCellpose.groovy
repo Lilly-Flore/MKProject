@@ -18,7 +18,7 @@
  */
 
 // Specify the model name (cyto, nuc, cyto2, omni_bact or a path to your custom model as a string)
-def pathModel = '/home/big/Desktop/MarrowBone/MKProject/Common/models/cellpose_residual_on_style_on_concatenation_off_train_2023_11_23_16_55_54.334502'
+def pathModel = '/home/big/Desktop/MarrowBone/MKProject/Commonfirst/models/cellpose_residual_on_style_on_concatenation_off_train_2023_11_23_16_55_54.334502'
 def cellpose = Cellpose2D.builder( pathModel )
         .pixelSize( 0.1721 * 4 )                  // Resolution for detection in um
 //        .channels( 'DAPI' )	               // Select detection channel(s)
@@ -45,8 +45,8 @@ def cellpose = Cellpose2D.builder( pathModel )
 
 // Run detection for the selected objects
 def imageData = getCurrentImageData()
-def pathObjects = getSelectedObjects() // To process only selected annotations, useful while testing
-// def pathObjects = getAnnotationObjects() // To process all annotations. For working in batch mode
+//def pathObjects = getSelectedObjects() // To process only selected annotations, useful while testing
+ def pathObjects = getAnnotationObjects() // To process all annotations. For working in batch mode
 if (pathObjects.isEmpty()) {
     Dialogs.showErrorMessage("Cellpose", "Please select a parent object!")
     return
