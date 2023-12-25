@@ -3,31 +3,37 @@ addShapeMeasurements("AREA", "LENGTH", "CIRCULARITY", "SOLIDITY", "MAX_DIAMETER"
 
 def px = getCurrentServer().getPixelCalibration().getAveragedPixelSizeMicrons()
 
-// Only select the MK it.getName()?.contains("LF") }
 def pathObjects = QP.getDetectionObjects().findAll { it.getPathClass() ==  getPathClass("MK")} /*getAnnotationObjects().findAll  { 
                     !(it.getPathClass() ==  getPathClass("Training") ||    
                     it.getPathClass() ==  getPathClass("Validation"))
                     }*/
-
+print(pathObjects)
 pathObjects.each{ o ->
     def children = o.getChildObjects()
     def num_nuclei = 0.0
+    def nuc_area_px = null
+    def nuc_min_diam_px = null
+    def nuc_max_diam_px = null
+    def nuc_circ_px = null
+    def nuc_min_hema = null
+    def nuc_max_hema = null
+    def nuc_mean_hema = null
+    def nuc_std_hema = null
     
-    if(children != null) {
+    if(!children.isEmpty()) {
         num_nuclei = children.size() as double 
-        o.measurements['Number of nuclei'] = num_nuclei
-    }   
+        o.measurements['Number of nuclei'] = num_nuclei   
     
-    def nuc_area_px = children.collect{ it.getROI().getArea() }?.sum() / num_nuclei
-    def nuc_min_diam_px = children.collect{ it.measurements['Min diameter µm'] }?.sum() / num_nuclei
-    def nuc_max_diam_px = children.collect{ it.measurements['Max diameter µm'] }?.sum() / num_nuclei
-    def nuc_circ_px = children.collect{ it.measurements['Circularity'] }?.sum() / num_nuclei
-    def nuc_min_hema = children.collect{ it.measurements['Hematoxylin: Min'] }?.sum() / num_nuclei
-    def nuc_max_hema = children.collect{ it.measurements['Hematoxylin: Max'] }?.sum() / num_nuclei
-    def nuc_mean_hema = children.collect{ it.measurements['Hematoxylin: Mean'] }?.sum() / num_nuclei
-    def nuc_std_hema = children.collect{ it.measurements['Hematoxylin: Std.Dev.'] }?.sum() / num_nuclei
-    //print(nuc_max_diam_px)
-    
+        nuc_area_px = children.collect{ it.getROI().getArea() }?.sum() / num_nuclei
+        nuc_min_diam_px = children.collect{ it.measurements['Min diameter µm'] }?.sum() / num_nuclei
+        nuc_max_diam_px = children.collect{ it.measurements['Max diameter µm'] }?.sum() / num_nuclei
+        nuc_circ_px = children.collect{ it.measurements['Circularity'] }?.sum() / num_nuclei
+        nuc_min_hema = children.collect{ it.measurements['Hematoxylin: Min'] }?.sum() / num_nuclei
+        nuc_max_hema = children.collect{ it.measurements['Hematoxylin: Max'] }?.sum() / num_nuclei
+        nuc_mean_hema = children.collect{ it.measurements['Hematoxylin: Mean'] }?.sum() / num_nuclei
+        nuc_std_hema = children.collect{ it.measurements['Hematoxylin: Std.Dev.'] }?.sum() / num_nuclei
+ 
+    }
     
     if(nuc_area_px != null) {
         // Calculate area ratio
@@ -35,6 +41,7 @@ pathObjects.each{ o ->
         o.measurements['Area Ratio %'] = area_ratio
         o.measurements['Nuclei Area '+GeneralTools.micrometerSymbol()+'^2: Mean' ] = nuc_area_px * px * px
     }
+    
     if(nuc_min_diam_px != null) {
         // Calculate min diameter ratio
         def min_diam_ratio = nuc_min_diam_px / o.measurements['Min diameter µm'] * 100

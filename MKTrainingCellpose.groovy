@@ -21,7 +21,7 @@ def cellpose = Cellpose2D.builder("cyto") // Can choose "None" if you want to tr
           .pixelSize( 0.1721 * 4 )                  // Resolution for detection in um
 //        .channels("DAPI", "CY3")  // or work with .cellposeChannels( channel1, channel2 ) and follow the cellpose way
 //                .preprocess(ImageOps.Filters.gaussianBlur(1)) // Optional preprocessing QuPath Ops
-                .epochs(500)             // Optional: will default to 500
+                .epochs(150)             // Optional: will default to 500
 //                .groundTruthDirectory( new File("/my/ground/truth/folder")) // Optional: If you wish to save your GT elsewhere than the QuPath Project
 //                .learningRate(0.2)       // Optional: Will default to 0.2
                 .batchSize(8)            // Optional: Will default to 8
@@ -37,7 +37,7 @@ def resultModel = cellpose.train()
 
 // Pick up results to see how the training was performed
 println "Model Saved under: "
-println resultModel.getAbsolutePath().toString() // To make it easier to copy paste in windows
+println resultModel.getAbsolutePath().toString()
 
 // You can get a ResultsTable of the training.
 def results = cellpose.getTrainingResults()
