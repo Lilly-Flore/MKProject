@@ -24,7 +24,8 @@ the number of nuclei, area, diameter, circularity, and hematoxylin values.
 
 Note: Exception handling is implemented for potential errors during file reading, data processing, and PDF creation.
 """
-import PyPDF2
+import csv
+from PyPDF2 import PdfReader, PdfWriter
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -35,7 +36,7 @@ from reportlab.lib.pagesizes import letter
 
 ######################################## GET TSV FILE ###########################################
 # Load the TSV file into a pandas DataFrame, specifying the delimiter
-measurements_file_tsv = '/Users/lilly-flore/Desktop/Bachelor_Project/MKProject/measurements.tsv'
+measurements_file_tsv = '/Users/lilly-flore/Desktop/Bachelor_Project/MKProject/measurements-4.tsv'
 
 try:
     df = pd.read_csv(measurements_file_tsv, delimiter='\t')
@@ -45,6 +46,53 @@ except pd.errors.EmptyDataError:
     print(f"Error: The file {measurements_file_tsv} is empty or contains no data.")
 except pd.errors.ParserError:
     print(f"Error: There was an issue parsing the TSV file {measurements_file_tsv}.")
+
+######################################## CREATE SCATTER PLOT ###########################################
+def scatter_plot(list_of_maps, x_label, y_label):
+    """
+    Create a scatter plot based on a list of maps, where each map represents data points for a specific image.
+
+    Parameters:
+    - list_of_maps (list of dict): A list of dictionaries, each containing data for a specific image.
+    - x_label (str): The label for the x-axis, specifying the key in each map corresponding to the x-axis values.
+    - y_label (str): The label for the y-axis, specifying the key in each map corresponding to the y-axis values.
+
+    Returns:
+    - fig (matplotlib.figure.Figure): The matplotlib figure containing the scatter plot.
+
+    Example:
+    >>> scatter_plot(data_list, 'Diameter', 'Area')
+    """
+
+    fig, ax = plt.subplots()
+    unique_images = set(item['Image'] for item in list_of_maps)
+
+    # Iterate over each unique image and add a scatter plot
+    for image in unique_images:
+        filtered_maps = [item for item in list_of_maps if item['Image'] == image]
+        x_values = [item[x_label] for item in filtered_maps]
+        y_values = [item[y_label] for item in filtered_maps]
+
+        ax.scatter(x_values, y_values, label=image.split('_')[0])
+
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    ax.set_title(f"{x_label} vs {y_label}")
+    ax.legend()
+    return fig
+
+######################################## CREATE MAPS ###########################################
+
+# Create a list to store the maps for each row
+list_of_maps = []
+
+# Iterate over each row in the DataFrame
+for index, row in df.iterrows():
+    # Convert the row to a dictionary and append it to the list
+    row_map = row.to_dict()
+    list_of_maps.append(row_map)
+
+list_of_maps.append({'Image': 'N14_HE_LF_Detection.ome.tiff', 'Name': 'MK', 'Object ID': 'b4a1a440-3555-4f56-a4f1-4d5f64ef1972', 'Area µm^2': 158.666, 'Circularity': 0.9169, 'Max diameter µm': 47.9511, 'Min diameter µm': 37.6146, 'Hematoxylin: Mean': 0.2038, 'Hematoxylin: Min': -0.0467, 'Hematoxylin: Max': 1.0995, 'Hematoxylin: Std.Dev.': 0.1501, 'Number of nuclei': 2.0, 'Area Ratio %': 10.4542, 'Nuclei Area µm^2: Mean': 142.0365, 'Diameter Ratio %: Min': 31.3104, 'Nuclei diameter µm: Mean Min': 11.7773, 'Diameter Ratio %: Max': 30.8661, 'Nuclei diameter µm: Mean Max': 0.7646, 'Circularity Ratio %': 183.0647, 'Nuclei Circularity µm: Mean': 0.0489, 'Nuclei Hematoxylin: Min': 0.0913, 'Nuclei Hematoxylin: Max': 0.7406, 'Nuclei Hematoxylin: Mean': 0.7406, 'Nuclei Hematoxylin: Std.Dev.': 0.7406})
 
 ################################### CREATE STATISTICS HISTOGRAM #####################################
 def extract_unit_scientific_notation(number):
@@ -103,7 +151,6 @@ def plot_histogram(list, x_label, y_label):
         print(f"Error: {ve}")
     except Exception as e:
         print(f"Error: An unexpected error occurred in plot_histogram. {e}")
-
 
 #####################################################################################
 
@@ -177,40 +224,6 @@ def create_pdf_with_tables(file_path, tables):
         print(f"Error: An unexpected error occurred in create_pdf_with_tables. {e}")
 
 #####################################################################################
-
-def plot_2_y_for_1_x(x_list, y1_list, y2_list, y1_label, y2_label):
-    """
-    Plots two Y-values against one X-value.
-
-    Parameters:
-    - x_list (list): The list of X-axis values.
-    - y1_list (list): The list of Y1-axis values.
-    - y2_list (list): The list of Y2-axis values.
-    - y1_label (str): The label for Y1-axis.
-    - y2_label (str): The label for Y2-axis.
-
-    Returns:
-    matplotlib.figure.Figure: The matplotlib figure object.
-    """
-
-    try:
-        # Plotting
-        plt.plot(x_list, y1_list, label=y1_label)
-        plt.plot(x_list, y2_list, label=y2_label)
-
-        # Adding labels and title
-        plt.xlabel('X-axis')
-        plt.ylabel('Y-axis')
-        plt.title('Two Y-values for One X-value Plot')
-
-        return plt.savefig('two_y_for_one_x_plot.pdf')
-
-    except ValueError as ve:
-        print(f"Error: {ve}")
-    except Exception as e:
-        print(f"Error: An unexpected error occurred in plot_2_y_for_1_x. {e}")
-
-#####################################################################################
 def merge_pdfs(pdf1_path, pdf2_path, o_path):
     """
     Merges two PDF files into one.
@@ -222,21 +235,21 @@ def merge_pdfs(pdf1_path, pdf2_path, o_path):
     """
     try:
         with open(pdf1_path, 'rb') as file1, open(pdf2_path, 'rb') as file2:
-            pdf_reader1 = PyPDF2.PdfFileReader(file1)
-            pdf_reader2 = PyPDF2.PdfFileReader(file2)
+            pdf_reader1 = PdfReader(file1)
+            pdf_reader2 = PdfReader(file2)
 
             # Create a PDF writer
-            pdf_writer = PyPDF2.PdfFileWriter()
+            pdf_writer = PdfWriter()
 
             # Add pages from the first PDF
-            for page_num in range(pdf_reader1.numPages):
-                page = pdf_reader1.getPage(page_num)
-                pdf_writer.addPage(page)
+            for page_num in range(len(pdf_reader1.pages)):
+                page = pdf_reader1.pages[page_num]
+                pdf_writer.add_page(page)
 
             # Add pages from the second PDF
-            for page_num in range(pdf_reader2.numPages):
-                page = pdf_reader2.getPage(page_num)
-                pdf_writer.addPage(page)
+            for page_num in range(len(pdf_reader2.pages)):
+                page = pdf_reader2.pages[page_num]
+                pdf_writer.add_page(page)
 
             # Write the combined PDF to the output file
             with open(o_path, 'wb') as output_file:
@@ -244,14 +257,12 @@ def merge_pdfs(pdf1_path, pdf2_path, o_path):
 
     except FileNotFoundError:
         print(f"Error: One or both of the PDF files {pdf1_path} and {pdf2_path} not found.")
-    except PyPDF2.utils.PdfReadError:
-        print(f"Error: There was an issue reading the PDF files {pdf1_path} or {pdf2_path}.")
     except Exception as e:
         print(f"Error: An unexpected error occurred during PDF merge. {e}")
 
 ################################### INITIATE VALUES ########################################
 
-columns_to_extract = ['Object ID','Name', 'Number of nuclei',
+columns_to_extract = ['Image', 'Object ID','Name', 'Number of nuclei',
                       'Area µm^2', 'Area Ratio %', 'Nuclei Area µm^2: Mean',
                       'Min diameter µm', 'Nuclei diameter µm: Mean Min', 'Diameter Ratio %: Min'
                       'Max diameter µm', 'Nuclei diameter µm: Mean Max', 'Diameter Ratio %: Max',
@@ -260,7 +271,7 @@ columns_to_extract = ['Object ID','Name', 'Number of nuclei',
                       'Nuclei Hematoxylin: Max', 'Nuclei Hematoxylin: Min', 'Nuclei Hematoxylin: Mean', 'Nuclei Hematoxylin: Std.Dev.'
                       ]
 
-# Lists creation
+# Creation of lists
 name_list = df['Name'].tolist()
 num_nuclei_list = df['Number of nuclei'].tolist()
 
@@ -280,7 +291,6 @@ circularity_list = df['Circularity'].tolist()
 nuc_circ_list = df['Nuclei Circularity µm: Mean'].tolist()
 circ_ratio_list = df['Circularity Ratio %'].tolist()
 
-
 min_hema_list = df['Hematoxylin: Min'].tolist()
 max_hema_list = df['Hematoxylin: Max'].tolist()
 mean_hema_list = df['Hematoxylin: Mean'].tolist()
@@ -293,6 +303,7 @@ nuc_std_hema_list = df['Nuclei Hematoxylin: Std.Dev.'].tolist()
 graphs_pdf = "Graphs.pdf"
 with PdfPages(graphs_pdf) as pdf:
 
+    # Creation of histograms
     num_nuclei_fig = plot_histogram(num_nuclei_list, 'Number of nuclei', 'Number of Megakaryocytes')
     pdf.savefig(num_nuclei_fig)
 
@@ -331,14 +342,20 @@ with PdfPages(graphs_pdf) as pdf:
     mean_hema_fig = plot_histogram(mean_hema_list, 'Hematoxylin: Mean', 'Number of Megakaryocytes')
     pdf.savefig(mean_hema_fig)
 
-    nuc_min_hema_fig = plot_histogram(nuc_min_hema_list, 'Hematoxylin: Min', 'Number of Nuclei')
-    pdf.savefig(nuc_min_hema_fig)
-    nuc_max_hema_fig = plot_histogram(nuc_max_hema_list, 'Hematoxylin: Max', 'Number of Nuclei')
-    pdf.savefig(nuc_max_hema_fig)
-    nuc_mean_hema_fig = plot_histogram(nuc_mean_hema_list, 'Hematoxylin: Mean', 'Number of Nuclei')
-    pdf.savefig(nuc_mean_hema_fig)
-    nuc_std_hema_fig = plot_histogram(nuc_std_hema_list, 'Hematoxylin: Std.Dev.', 'Number of Nuclei')
-    pdf.savefig(nuc_std_hema_fig)
+    #nuc_min_hema_fig = plot_histogram(nuc_min_hema_list, 'Hematoxylin: Min', 'Number of Nuclei')
+    #pdf.savefig(nuc_min_hema_fig)
+    #nuc_max_hema_fig = plot_histogram(nuc_max_hema_list, 'Hematoxylin: Max', 'Number of Nuclei')
+    #pdf.savefig(nuc_max_hema_fig)
+    #nuc_mean_hema_fig = plot_histogram(nuc_mean_hema_list, 'Hematoxylin: Mean', 'Number of Nuclei')
+    #pdf.savefig(nuc_mean_hema_fig)
+    #nuc_std_hema_fig = plot_histogram(nuc_std_hema_list, 'Hematoxylin: Std.Dev.', 'Number of Nuclei')
+    #pdf.savefig(nuc_std_hema_fig)
+
+    # Creation of scatter plots
+    area_circ_scatter = scatter_plot(list_of_maps, 'Area µm^2', 'Circularity')
+    pdf.savefig(area_circ_scatter)
+    MK_num_nuc_scatter = scatter_plot(list_of_maps, 'Object ID', 'Number of nuclei')
+    pdf.savefig(MK_num_nuc_scatter)
 
 tables_pdf = "Tables.pdf"
 tables = []
