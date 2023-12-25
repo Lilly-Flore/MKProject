@@ -59,9 +59,6 @@ def scatter_plot(list_of_maps, x_label, y_label):
 
     Returns:
     - fig (matplotlib.figure.Figure): The matplotlib figure containing the scatter plot.
-
-    Example:
-    >>> scatter_plot(data_list, 'Diameter', 'Area')
     """
 
     fig, ax = plt.subplots()
@@ -79,6 +76,10 @@ def scatter_plot(list_of_maps, x_label, y_label):
     ax.set_ylabel(y_label)
     ax.set_title(f"{x_label} vs {y_label}")
     ax.legend()
+
+    # Explicitly close the figure to release memory
+    plt.close(fig)
+
     return fig
 
 ######################################## CREATE MAPS ###########################################
@@ -145,6 +146,10 @@ def plot_histogram(list, x_label, y_label):
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
         ax.grid(False)
+
+        # Explicitly close the figure to release memory
+        plt.close(fig)
+
         return fig
 
     except ValueError as ve:
@@ -342,14 +347,14 @@ with PdfPages(graphs_pdf) as pdf:
     mean_hema_fig = plot_histogram(mean_hema_list, 'Hematoxylin: Mean', 'Number of Megakaryocytes')
     pdf.savefig(mean_hema_fig)
 
-    #nuc_min_hema_fig = plot_histogram(nuc_min_hema_list, 'Hematoxylin: Min', 'Number of Nuclei')
-    #pdf.savefig(nuc_min_hema_fig)
-    #nuc_max_hema_fig = plot_histogram(nuc_max_hema_list, 'Hematoxylin: Max', 'Number of Nuclei')
-    #pdf.savefig(nuc_max_hema_fig)
-    #nuc_mean_hema_fig = plot_histogram(nuc_mean_hema_list, 'Hematoxylin: Mean', 'Number of Nuclei')
-    #pdf.savefig(nuc_mean_hema_fig)
-    #nuc_std_hema_fig = plot_histogram(nuc_std_hema_list, 'Hematoxylin: Std.Dev.', 'Number of Nuclei')
-    #pdf.savefig(nuc_std_hema_fig)
+    nuc_min_hema_fig = plot_histogram(nuc_min_hema_list, 'Hematoxylin: Min', 'Number of Nuclei')
+    pdf.savefig(nuc_min_hema_fig)
+    nuc_max_hema_fig = plot_histogram(nuc_max_hema_list, 'Hematoxylin: Max', 'Number of Nuclei')
+    pdf.savefig(nuc_max_hema_fig)
+    nuc_mean_hema_fig = plot_histogram(nuc_mean_hema_list, 'Hematoxylin: Mean', 'Number of Nuclei')
+    pdf.savefig(nuc_mean_hema_fig)
+    nuc_std_hema_fig = plot_histogram(nuc_std_hema_list, 'Hematoxylin: Std.Dev.', 'Number of Nuclei')
+    pdf.savefig(nuc_std_hema_fig)
 
     # Creation of scatter plots
     area_circ_scatter = scatter_plot(list_of_maps, 'Area µm^2', 'Circularity')
