@@ -140,13 +140,24 @@ def plot_histogram(in_list, x_label, y_label):
         # Calculate the bin edges and the number of occurrences in each bin
         min_value = min(in_list)
         max_value = max(in_list)
-        bin_width = (max_value - min_value + 1) / (len(set(in_list)) % 50)
-        gap = max_value - min_value
-        if int(gap).__eq__(0):
-            new_gap = extract_unit_scientific_notation(gap)
-            num_bins = int(new_gap / bin_width)
+        gap = abs(max_value) - abs(min_value)
+
+        if 0.01 <= gap <= 0.01:
+            bin_width = 0.001
+        elif 0.1 < gap <= 2:
+            bin_width = 0.1
+        elif 2 < gap <= 20:
+            bin_width = 1
+        elif 20 < gap <= 100:
+            bin_width = 5
+        elif 100 < gap <= 1000:
+            bin_width = 10
+        elif 1000 < gap <= 10000:
+            bin_width = 50
         else:
-            num_bins = int(gap / bin_width)
+            bin_width = 1
+
+        num_bins = math.ceil(gap / bin_width)
 
         # Display the histogram
         fig, ax = plt.subplots()
@@ -161,10 +172,9 @@ def plot_histogram(in_list, x_label, y_label):
 
         return fig
 
-    except ValueError as ve:
-        print(f"Error: {ve}")
     except Exception as e:
-        print(f"Error: An unexpected error occurred in plot_histogram. {e}")
+        print(f"An error occurred: {e}")
+        return None
 
 
 ########## CREATE TABLE ##########
@@ -301,7 +311,7 @@ columns_to_extract = ['Image', 'Object ID', 'Name', 'Number of nuclei',
 
 # Creation of lists
 name_list = df['Name'].tolist()
-num_nuclei_list = list(map(int, filter_list(df['Number of nuclei'].tolist())))
+num_nuclei_list = filter_list(df['Number of nuclei'].tolist())
 
 area_list = filter_list(df['Area µm^2'].tolist())
 nuc_area_list = filter_list(df['Nuclei Area µm^2: Mean'].tolist())
