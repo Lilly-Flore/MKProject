@@ -18,7 +18,7 @@
  */
 
 // Specify the model name (cyto, nuc, cyto2, omni_bact or a path to your custom model as a string)
-def pathModel = '/home/big/Desktop/MarrowBone/MKProject/Commonfirst/models/cellpose_residual_on_style_on_concatenation_off_train_2023_11_23_16_55_54.334502'
+def pathModel = '/home/big/Desktop/MarrowBone/MKProject/Common/models/cellpose_residual_on_style_on_concatenation_off_train_2023_12_28_17_52_40.974592'
 def cellpose = Cellpose2D.builder( pathModel )
         .pixelSize( 0.1721 * 4 )                  // Resolution for detection in um
 //        .channels( 'DAPI' )	               // Select detection channel(s)
