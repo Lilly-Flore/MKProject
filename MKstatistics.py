@@ -11,7 +11,8 @@ the number of nuclei, area, diameter, circularity, and hematoxylin values.
    - Reads the measurements TSV file into a pandas DataFrame.
 
 2. Generate Histograms:
-   - Produces histograms for different MK and nuclei parameters, such as number, area, diameter, circularity, and hematoxylin.
+   - Produces histograms for different MK and nuclei parameters, such as number, area, diameter, circularity,
+   and hematoxylin.
 
 3. Create Tables:
    - Computes and creates tables with summary statistics for MK and nuclei parameters.
@@ -24,7 +25,7 @@ the number of nuclei, area, diameter, circularity, and hematoxylin values.
 
 Note: Exception handling is implemented for potential errors during file reading, data processing, and PDF creation.
 """
-import csv
+
 from PyPDF2 import PdfReader, PdfWriter
 import numpy as np
 import pandas as pd
@@ -34,9 +35,9 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
 from reportlab.lib.pagesizes import letter
 
-######################################## GET TSV FILE ###########################################
+########## GET TSV FILE ##########
 # Load the TSV file into a pandas DataFrame, specifying the delimiter
-measurements_file_tsv = '/Users/lilly-flore/Desktop/Bachelor_Project/MKProject/measurements-4.tsv'
+measurements_file_tsv = '/Users/lilly-flore/Desktop/Bachelor_Project/MKProject/measurements.tsv'
 
 try:
     df = pd.read_csv(measurements_file_tsv, delimiter='\t')
@@ -47,7 +48,7 @@ except pd.errors.EmptyDataError:
 except pd.errors.ParserError:
     print(f"Error: There was an issue parsing the TSV file {measurements_file_tsv}.")
 
-######################################## CREATE SCATTER PLOT ###########################################
+########## CREATE SCATTER PLOT ##########
 def scatter_plot(list_of_maps, x_label, y_label):
     """
     Create a scatter plot based on a list of maps, where each map represents data points for a specific image.
@@ -82,20 +83,7 @@ def scatter_plot(list_of_maps, x_label, y_label):
 
     return fig
 
-######################################## CREATE MAPS ###########################################
-
-# Create a list to store the maps for each row
-list_of_maps = []
-
-# Iterate over each row in the DataFrame
-for index, row in df.iterrows():
-    # Convert the row to a dictionary and append it to the list
-    row_map = row.to_dict()
-    list_of_maps.append(row_map)
-
-list_of_maps.append({'Image': 'N14_HE_LF_Detection.ome.tiff', 'Name': 'MK', 'Object ID': 'b4a1a440-3555-4f56-a4f1-4d5f64ef1972', 'Area µm^2': 158.666, 'Circularity': 0.9169, 'Max diameter µm': 47.9511, 'Min diameter µm': 37.6146, 'Hematoxylin: Mean': 0.2038, 'Hematoxylin: Min': -0.0467, 'Hematoxylin: Max': 1.0995, 'Hematoxylin: Std.Dev.': 0.1501, 'Number of nuclei': 2.0, 'Area Ratio %': 10.4542, 'Nuclei Area µm^2: Mean': 142.0365, 'Diameter Ratio %: Min': 31.3104, 'Nuclei diameter µm: Mean Min': 11.7773, 'Diameter Ratio %: Max': 30.8661, 'Nuclei diameter µm: Mean Max': 0.7646, 'Circularity Ratio %': 183.0647, 'Nuclei Circularity µm: Mean': 0.0489, 'Nuclei Hematoxylin: Min': 0.0913, 'Nuclei Hematoxylin: Max': 0.7406, 'Nuclei Hematoxylin: Mean': 0.7406, 'Nuclei Hematoxylin: Std.Dev.': 0.7406})
-
-################################### CREATE STATISTICS HISTOGRAM #####################################
+########## CREATE STATISTICS HISTOGRAM ##########
 def extract_unit_scientific_notation(number):
     """
     Extracts the unit from a number in scientific notation.
@@ -157,7 +145,7 @@ def plot_histogram(list, x_label, y_label):
     except Exception as e:
         print(f"Error: An unexpected error occurred in plot_histogram. {e}")
 
-#####################################################################################
+########## CREATE TABLE ##########
 
 def create_table(MK_name, nuc_name, MK_value, nuc_value):
     """
@@ -200,7 +188,7 @@ def create_table(MK_name, nuc_name, MK_value, nuc_value):
     except Exception as e:
         print(f"Error: An unexpected error occurred in create_table. {e}")
 
-#####################################################################################
+######### CREATE PDF ###########
 def create_pdf_with_tables(file_path, tables):
     """
     Creates a PDF document with multiple tables.
@@ -228,7 +216,7 @@ def create_pdf_with_tables(file_path, tables):
     except Exception as e:
         print(f"Error: An unexpected error occurred in create_pdf_with_tables. {e}")
 
-#####################################################################################
+
 def merge_pdfs(pdf1_path, pdf2_path, o_path):
     """
     Merges two PDF files into one.
@@ -265,7 +253,16 @@ def merge_pdfs(pdf1_path, pdf2_path, o_path):
     except Exception as e:
         print(f"Error: An unexpected error occurred during PDF merge. {e}")
 
-################################### INITIATE VALUES ########################################
+########## INITIATE VALUES ##########
+
+# Create a list to store the maps for each row
+list_of_maps = []
+
+# Iterate over each row in the DataFrame
+for index, row in df.iterrows():
+    # Convert the row to a dictionary and append it to the list
+    row_map = row.to_dict()
+    list_of_maps.append(row_map)
 
 columns_to_extract = ['Image', 'Object ID','Name', 'Number of nuclei',
                       'Area µm^2', 'Area Ratio %', 'Nuclei Area µm^2: Mean',
@@ -359,8 +356,6 @@ with PdfPages(graphs_pdf) as pdf:
     # Creation of scatter plots
     area_circ_scatter = scatter_plot(list_of_maps, 'Area µm^2', 'Circularity')
     pdf.savefig(area_circ_scatter)
-    MK_num_nuc_scatter = scatter_plot(list_of_maps, 'Object ID', 'Number of nuclei')
-    pdf.savefig(MK_num_nuc_scatter)
 
 tables_pdf = "Tables.pdf"
 tables = []
