@@ -52,7 +52,7 @@ except pd.errors.ParserError:
 
 
 ########## FILTER LIST ##########
-def filter_list(list):
+def filter_list(in_list):
     """
     Filters out elements with NaN values from a list.
 
@@ -62,12 +62,13 @@ def filter_list(list):
     Returns:
     list: A new list with NaN values removed.
     """
-    new_list = [e for e in list if not math.isnan(e)]
+    new_list = [e for e in in_list if not math.isnan(e)]
 
     return new_list
 
+
 ########## CREATE SCATTER PLOT ##########
-def scatter_plot(list_of_maps, x_label, y_label):
+def scatter_plot(in_list_of_maps, x_label, y_label):
     """
     Create a scatter plot based on a list of maps, where each map represents data points for a specific image.
 
@@ -81,11 +82,11 @@ def scatter_plot(list_of_maps, x_label, y_label):
     """
 
     fig, ax = plt.subplots()
-    unique_images = set(item['Image'] for item in list_of_maps)
+    unique_images = set(item['Image'] for item in in_list_of_maps)
 
     # Iterate over each unique image and add a scatter plot
     for image in unique_images:
-        filtered_maps = [item for item in list_of_maps if item['Image'] == image]
+        filtered_maps = [item for item in in_list_of_maps if item['Image'] == image]
         x_values = [item[x_label] for item in filtered_maps]
         y_values = [item[y_label] for item in filtered_maps]
 
@@ -222,7 +223,7 @@ def create_pdf_with_tables(file_path, in_tables):
 
     try:
         # Create a PDF document
-        pdf = SimpleDocTemplate(file_path, pagesize=letter)
+        in_pdf = SimpleDocTemplate(file_path, pagesize=letter)
 
         # Build the content with tables and space between them
         content = []
@@ -233,7 +234,7 @@ def create_pdf_with_tables(file_path, in_tables):
             content.append(Spacer(1, 12))  # Adjust the second parameter for the desired space
 
         # Build the PDF document
-        pdf.build(content)
+        in_pdf.build(content)
 
     except Exception as e:
         print(f"Error: An unexpected error occurred in create_pdf_with_tables. {e}")
