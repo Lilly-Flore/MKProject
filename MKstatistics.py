@@ -25,17 +25,19 @@ the number of nuclei, area, diameter, circularity, and hematoxylin values.
 
 Note: Exception handling is implemented for potential errors during file reading, data processing, and PDF creation.
 """
+import math
 
-from PyPDF2 import PdfReader, PdfWriter
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+from PyPDF2 import PdfReader, PdfWriter
 from matplotlib.backends.backend_pdf import PdfPages
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
 from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
 
 ########## GET TSV FILE ##########
+
 # Load the TSV file into a pandas DataFrame, specifying the delimiter
 measurements_file_tsv = '/Users/lilly-flore/Desktop/Bachelor_Project/MKProject/measurements.tsv'
 
@@ -47,6 +49,22 @@ except pd.errors.EmptyDataError:
     print(f"Error: The file {measurements_file_tsv} is empty or contains no data.")
 except pd.errors.ParserError:
     print(f"Error: There was an issue parsing the TSV file {measurements_file_tsv}.")
+
+
+########## FILTER LIST ##########
+def filter_list(list):
+    """
+    Filters out elements with NaN values from a list.
+
+    Parameters:
+    - list: The input list containing numeric values.
+
+    Returns:
+    list: A new list with NaN values removed.
+    """
+    new_list = [e for e in list if not math.isnan(e)]
+
+    return new_list
 
 ########## CREATE SCATTER PLOT ##########
 def scatter_plot(list_of_maps, x_label, y_label):
@@ -83,6 +101,7 @@ def scatter_plot(list_of_maps, x_label, y_label):
 
     return fig
 
+
 ########## CREATE STATISTICS HISTOGRAM ##########
 def extract_unit_scientific_notation(number):
     """
@@ -102,7 +121,8 @@ def extract_unit_scientific_notation(number):
 
     return float(after_e_part)
 
-def plot_histogram(list, x_label, y_label):
+
+def plot_histogram(in_list, x_label, y_label):
     """
     Plots a histogram for a given list of data.
 
@@ -117,9 +137,9 @@ def plot_histogram(list, x_label, y_label):
 
     try:
         # Calculate the bin edges and the number of occurrences in each bin
-        min_value = min(list)
-        max_value = max(list)
-        bin_width = (max_value - min_value + 1) / len(set(list))
+        min_value = min(in_list)
+        max_value = max(in_list)
+        bin_width = (max_value - min_value + 1) / (len(set(in_list)) % 50)
         gap = max_value - min_value
         if int(gap).__eq__(0):
             new_gap = extract_unit_scientific_notation(gap)
@@ -129,7 +149,7 @@ def plot_histogram(list, x_label, y_label):
 
         # Display the histogram
         fig, ax = plt.subplots()
-        ax.hist(list, bins=num_bins, color='grey', edgecolor='darkgrey')
+        ax.hist(in_list, bins=num_bins, color='grey', edgecolor='darkgrey')
         ax.set_title(f"{x_label}{' distribution'}")
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
@@ -144,6 +164,7 @@ def plot_histogram(list, x_label, y_label):
         print(f"Error: {ve}")
     except Exception as e:
         print(f"Error: An unexpected error occurred in plot_histogram. {e}")
+
 
 ########## CREATE TABLE ##########
 
@@ -188,8 +209,9 @@ def create_table(MK_name, nuc_name, MK_value, nuc_value):
     except Exception as e:
         print(f"Error: An unexpected error occurred in create_table. {e}")
 
+
 ######### CREATE PDF ###########
-def create_pdf_with_tables(file_path, tables):
+def create_pdf_with_tables(file_path, in_tables):
     """
     Creates a PDF document with multiple tables.
 
@@ -204,7 +226,7 @@ def create_pdf_with_tables(file_path, tables):
 
         # Build the content with tables and space between them
         content = []
-        for table in tables:
+        for table in in_tables:
             content.append(table)
 
             # Add space (Spacer) between tables
@@ -253,6 +275,7 @@ def merge_pdfs(pdf1_path, pdf2_path, o_path):
     except Exception as e:
         print(f"Error: An unexpected error occurred during PDF merge. {e}")
 
+
 ########## INITIATE VALUES ##########
 
 # Create a list to store the maps for each row
@@ -264,93 +287,97 @@ for index, row in df.iterrows():
     row_map = row.to_dict()
     list_of_maps.append(row_map)
 
-columns_to_extract = ['Image', 'Object ID','Name', 'Number of nuclei',
+columns_to_extract = ['Image', 'Object ID', 'Name', 'Number of nuclei',
                       'Area µm^2', 'Area Ratio %', 'Nuclei Area µm^2: Mean',
                       'Min diameter µm', 'Nuclei diameter µm: Mean Min', 'Diameter Ratio %: Min'
-                      'Max diameter µm', 'Nuclei diameter µm: Mean Max', 'Diameter Ratio %: Max',
+                                                                         'Max diameter µm',
+                      'Nuclei diameter µm: Mean Max', 'Diameter Ratio %: Max',
                       'Circularity', 'Nuclei Circularity µm: Mean', 'Circularity Ratio %',
                       'Hematoxylin: Mean', 'Hematoxylin: Min', 'Hematoxylin: Max',
-                      'Nuclei Hematoxylin: Max', 'Nuclei Hematoxylin: Min', 'Nuclei Hematoxylin: Mean', 'Nuclei Hematoxylin: Std.Dev.'
+                      'Nuclei Hematoxylin: Max', 'Nuclei Hematoxylin: Min', 'Nuclei Hematoxylin: Mean',
+                      'Nuclei Hematoxylin: Std.Dev.'
                       ]
 
 # Creation of lists
 name_list = df['Name'].tolist()
-num_nuclei_list = df['Number of nuclei'].tolist()
+num_nuclei_list = list(map(int, filter_list(df['Number of nuclei'].tolist())))
 
-area_list = df['Area µm^2'].tolist()
-nuc_area_list = df['Nuclei Area µm^2: Mean'].tolist()
-area_ratio_list = df['Area Ratio %'].tolist()
+area_list = filter_list(df['Area µm^2'].tolist())
+nuc_area_list = filter_list(df['Nuclei Area µm^2: Mean'].tolist())
+area_ratio_list = filter_list(df['Area Ratio %'].tolist())
 
-max_diameter_list = df['Max diameter µm'].tolist()
-nuc_max_diam_list = df['Nuclei diameter µm: Mean Max'].tolist()
-max_diam_ratio_list = df['Diameter Ratio %: Max'].tolist()
+max_diameter_list = filter_list(df['Max diameter µm'].tolist())
+nuc_max_diam_list = filter_list(df['Nuclei diameter µm: Mean Max'].tolist())
+max_diam_ratio_list = filter_list(df['Diameter Ratio %: Max'].tolist())
 
-min_diameter_list = df['Min diameter µm'].tolist()
-nuc_min_diam_list = df['Nuclei diameter µm: Mean Min'].tolist()
-min_diam_ratio_list = df['Diameter Ratio %: Min'].tolist()
+min_diameter_list = filter_list(df['Min diameter µm'].tolist())
+nuc_min_diam_list = filter_list(df['Nuclei diameter µm: Mean Min'].tolist())
+min_diam_ratio_list = filter_list(df['Diameter Ratio %: Min'].tolist())
 
-circularity_list = df['Circularity'].tolist()
-nuc_circ_list = df['Nuclei Circularity µm: Mean'].tolist()
-circ_ratio_list = df['Circularity Ratio %'].tolist()
+circularity_list = filter_list(df['Circularity'].tolist())
+nuc_circ_list = filter_list(df['Nuclei Circularity µm: Mean'].tolist())
+circ_ratio_list = filter_list(df['Circularity Ratio %'].tolist())
 
-min_hema_list = df['Hematoxylin: Min'].tolist()
-max_hema_list = df['Hematoxylin: Max'].tolist()
-mean_hema_list = df['Hematoxylin: Mean'].tolist()
-nuc_min_hema_list = df['Nuclei Hematoxylin: Min'].tolist()
-nuc_max_hema_list = df['Nuclei Hematoxylin: Max'].tolist()
-nuc_mean_hema_list = df['Nuclei Hematoxylin: Mean'].tolist()
-nuc_std_hema_list = df['Nuclei Hematoxylin: Std.Dev.'].tolist()
+min_hema_list = filter_list(df['Hematoxylin: Min'].tolist())
+max_hema_list = filter_list(df['Hematoxylin: Max'].tolist())
+mean_hema_list = filter_list(df['Hematoxylin: Mean'].tolist())
+nuc_min_hema_list = filter_list(df['Nuclei Hematoxylin: Min'].tolist())
+nuc_max_hema_list = filter_list(df['Nuclei Hematoxylin: Max'].tolist())
+nuc_mean_hema_list = filter_list(df['Nuclei Hematoxylin: Mean'].tolist())
+nuc_std_hema_list = filter_list(df['Nuclei Hematoxylin: Std.Dev.'].tolist())
 
 # Create pdf file
 graphs_pdf = "Graphs.pdf"
 with PdfPages(graphs_pdf) as pdf:
-
     # Creation of histograms
-    num_nuclei_fig = plot_histogram(num_nuclei_list, 'Number of nuclei', 'Number of Megakaryocytes')
+    y_label_MK = 'Number of Megakaryocytes'
+    y_label_nuclei = 'Number of Nuclei'
+
+    num_nuclei_fig = plot_histogram(num_nuclei_list, 'Number of nuclei', y_label_MK)
     pdf.savefig(num_nuclei_fig)
 
-    areaFig = plot_histogram(area_list, 'MK Area µm^2', 'Number of Megakaryocytes')
+    areaFig = plot_histogram(area_list, 'MK Area µm^2', y_label_MK)
     pdf.savefig(areaFig)
-    nuc_area_fig = plot_histogram(nuc_area_list, 'Nuclei Area µm^2', 'Number of Nuclei')
+    nuc_area_fig = plot_histogram(nuc_area_list, 'Nuclei Area µm^2', y_label_nuclei)
     pdf.savefig(nuc_area_fig)
-    area_ratio_fig = plot_histogram(area_ratio_list, 'Area Ratio %', 'Number of Megakaryocytes')
+    area_ratio_fig = plot_histogram(area_ratio_list, 'Area Ratio %', y_label_MK)
     pdf.savefig(area_ratio_fig)
 
-    max_diam_fig = plot_histogram(max_diameter_list, 'MK max diameter µm', 'Number of Megakaryocytes')
+    max_diam_fig = plot_histogram(max_diameter_list, 'MK max diameter µm', y_label_MK)
     pdf.savefig(max_diam_fig)
-    nuc_max_diam_fig = plot_histogram(nuc_max_diam_list, 'Nuclei mean max diameter µm', 'Number of Nuclei')
+    nuc_max_diam_fig = plot_histogram(nuc_max_diam_list, 'Nuclei mean max diameter µm', y_label_nuclei)
     pdf.savefig(nuc_max_diam_fig)
-    max_diam_ratio_fig = plot_histogram(max_diam_ratio_list, 'Max diameter Ratio %', 'Number of Megakaryocytes')
+    max_diam_ratio_fig = plot_histogram(max_diam_ratio_list, 'Max diameter Ratio %', y_label_MK)
     pdf.savefig(max_diam_ratio_fig)
 
-    min_diam_fig = plot_histogram(min_diameter_list, 'MK min diameter µm', 'Number of Megakaryocytes')
+    min_diam_fig = plot_histogram(min_diameter_list, 'MK min diameter µm', y_label_MK)
     pdf.savefig(min_diam_fig)
-    nuc_min_diam_fig = plot_histogram(nuc_min_diam_list, 'Nuclei mean min diameter µm', 'Number of Nuclei')
+    nuc_min_diam_fig = plot_histogram(nuc_min_diam_list, 'Nuclei mean min diameter µm', y_label_nuclei)
     pdf.savefig(nuc_min_diam_fig)
-    min_diam_ratio_fig = plot_histogram(min_diam_ratio_list, 'Min diameter Ratio %', 'Number of Megakaryocytes')
+    min_diam_ratio_fig = plot_histogram(min_diam_ratio_list, 'Min diameter Ratio %', y_label_MK)
     pdf.savefig(min_diam_ratio_fig)
 
-    circularity_fig = plot_histogram(circularity_list, 'MK circularity µm', 'Number of Megakaryocytes')
+    circularity_fig = plot_histogram(circularity_list, 'MK circularity µm', y_label_MK)
     pdf.savefig(circularity_fig)
-    nuc_circ_fig = plot_histogram(nuc_circ_list, 'Nuclei mean circularity µm', 'Number of Nuclei')
+    nuc_circ_fig = plot_histogram(nuc_circ_list, 'Nuclei mean circularity µm', y_label_nuclei)
     pdf.savefig(nuc_circ_fig)
-    circ_ratio_fig = plot_histogram(circ_ratio_list, 'Circularity Ratio %', 'Number of Megakaryocytes')
+    circ_ratio_fig = plot_histogram(circ_ratio_list, 'Circularity Ratio %', y_label_MK)
     pdf.savefig(circ_ratio_fig)
 
-    min_hema_fig = plot_histogram(min_hema_list, 'Hematoxylin: Min', 'Number of Megakaryocytes')
+    min_hema_fig = plot_histogram(min_hema_list, 'Hematoxylin: Min', y_label_MK)
     pdf.savefig(min_hema_fig)
-    max_hema_fig = plot_histogram(max_hema_list, 'Hematoxylin: Max', 'Number of Megakaryocytes')
+    max_hema_fig = plot_histogram(max_hema_list, 'Hematoxylin: Max', y_label_MK)
     pdf.savefig(max_hema_fig)
-    mean_hema_fig = plot_histogram(mean_hema_list, 'Hematoxylin: Mean', 'Number of Megakaryocytes')
+    mean_hema_fig = plot_histogram(mean_hema_list, 'Hematoxylin: Mean', y_label_MK)
     pdf.savefig(mean_hema_fig)
 
-    nuc_min_hema_fig = plot_histogram(nuc_min_hema_list, 'Hematoxylin: Min', 'Number of Nuclei')
+    nuc_min_hema_fig = plot_histogram(nuc_min_hema_list, 'Hematoxylin: Min', y_label_nuclei)
     pdf.savefig(nuc_min_hema_fig)
-    nuc_max_hema_fig = plot_histogram(nuc_max_hema_list, 'Hematoxylin: Max', 'Number of Nuclei')
+    nuc_max_hema_fig = plot_histogram(nuc_max_hema_list, 'Hematoxylin: Max', y_label_nuclei)
     pdf.savefig(nuc_max_hema_fig)
-    nuc_mean_hema_fig = plot_histogram(nuc_mean_hema_list, 'Hematoxylin: Mean', 'Number of Nuclei')
+    nuc_mean_hema_fig = plot_histogram(nuc_mean_hema_list, 'Hematoxylin: Mean', y_label_nuclei)
     pdf.savefig(nuc_mean_hema_fig)
-    nuc_std_hema_fig = plot_histogram(nuc_std_hema_list, 'Hematoxylin: Std.Dev.', 'Number of Nuclei')
+    nuc_std_hema_fig = plot_histogram(nuc_std_hema_list, 'Hematoxylin: Std.Dev.', y_label_nuclei)
     pdf.savefig(nuc_std_hema_fig)
 
     # Creation of scatter plots
@@ -363,29 +390,45 @@ tables = []
 number_table = create_table('Number of megakaryocytes', 'Number of nuclei', len(name_list), sum(num_nuclei_list))
 tables.append(number_table)
 
-mean_area_table = create_table('MK mean area', 'Nuclei mean area', f"{round(np.mean(area_list), 2)} (µm^2)", f"{round(np.mean(nuc_area_list), 2)} (µm^2)")
+mean_area_table = create_table('MK mean area', 'Nuclei mean area', f"{round(np.mean(area_list), 2)} (µm^2)",
+                               f"{round(np.mean(nuc_area_list), 2)} (µm^2)")
 tables.append(mean_area_table)
-std_area_table = create_table('MK area std', 'Nuclei area std', f"{round(np.std(area_list), 2)} (µm^2)", f"{round(np.std(nuc_area_list), 2)} (µm^2)")
+std_area_table = create_table('MK area std', 'Nuclei area std', f"{round(np.std(area_list), 2)} (µm^2)",
+                              f"{round(np.std(nuc_area_list), 2)} (µm^2)")
 tables.append(std_area_table)
 
-mean_max_diam_table = create_table('MK mean max diameter', 'Nuclei mean max diameter', f"{round(np.mean(max_diameter_list), 2)} (µm)", f"{round(np.mean(nuc_max_diam_list), 2)} (µm)")
+mean_max_diam_table = create_table('MK mean max diameter', 'Nuclei mean max diameter',
+                                   f"{round(np.mean(max_diameter_list), 2)} (µm)",
+                                   f"{round(np.mean(nuc_max_diam_list), 2)} (µm)")
 tables.append(mean_max_diam_table)
-std_max_diam_table = create_table('MK max diameter std', 'Nuclei max diameter std', f"{round(np.std(max_diameter_list), 2)} (µm)", f"{round(np.std(nuc_max_diam_list), 2)} (µm)")
+std_max_diam_table = create_table('MK max diameter std', 'Nuclei max diameter std',
+                                  f"{round(np.std(max_diameter_list), 2)} (µm)",
+                                  f"{round(np.std(nuc_max_diam_list), 2)} (µm)")
 tables.append(std_max_diam_table)
 
-mean_min_diam_table = create_table('MK mean min diameter', 'Nuclei mean min diameter', f"{round(np.mean(min_diameter_list), 2)} (µm)", f"{round(np.mean(nuc_min_diam_list), 2)} (µm)")
+mean_min_diam_table = create_table('MK mean min diameter', 'Nuclei mean min diameter',
+                                   f"{round(np.mean(min_diameter_list), 2)} (µm)",
+                                   f"{round(np.mean(nuc_min_diam_list), 2)} (µm)")
 tables.append(mean_min_diam_table)
-std_min_diam_table = create_table('MK min diameter std', 'Nuclei min diameter std', f"{round(np.std(min_diameter_list), 2)} (µm)", f"{round(np.std(nuc_min_diam_list), 2)} (µm)")
+std_min_diam_table = create_table('MK min diameter std', 'Nuclei min diameter std',
+                                  f"{round(np.std(min_diameter_list), 2)} (µm)",
+                                  f"{round(np.std(nuc_min_diam_list), 2)} (µm)")
 tables.append(std_min_diam_table)
 
-mean_circularity_table = create_table('MK mean circularity', 'Nuclei mean circularity', f"{round(np.mean(circularity_list), 2)} (µm)", f"{round(np.mean(nuc_circ_list), 2)} (µm)")
+mean_circularity_table = create_table('MK mean circularity', 'Nuclei mean circularity',
+                                      f"{round(np.mean(circularity_list), 2)} (µm)",
+                                      f"{round(np.mean(nuc_circ_list), 2)} (µm)")
 tables.append(mean_circularity_table)
-std_circularity_table = create_table('MK circularity std', 'Nuclei circularity std', f"{round(np.std(circularity_list), 2)} (µm)", f"{round(np.std(nuc_circ_list), 2)} (µm)")
+std_circularity_table = create_table('MK circularity std', 'Nuclei circularity std',
+                                     f"{round(np.std(circularity_list), 2)} (µm)",
+                                     f"{round(np.std(nuc_circ_list), 2)} (µm)")
 tables.append(std_circularity_table)
 
-mean_hema_table = create_table('MK mean hematoxylin', 'Nuclei mean hematoxylin', f"{round(np.mean(mean_hema_list), 2)}", f"{round(np.mean(nuc_mean_hema_list), 2)}")
+mean_hema_table = create_table('MK mean hematoxylin', 'Nuclei mean hematoxylin', f"{round(np.mean(mean_hema_list), 2)}",
+                               f"{round(np.mean(nuc_mean_hema_list), 2)}")
 tables.append(mean_hema_table)
-mean_hema_table = create_table('MK hematoxylin std', 'Nuclei hematoxylin std', f"{round(np.std(mean_hema_list), 2)}", f"{round(np.mean(nuc_std_hema_list), 2)}")
+mean_hema_table = create_table('MK hematoxylin std', 'Nuclei hematoxylin std', f"{round(np.std(mean_hema_list), 2)}",
+                               f"{round(np.mean(nuc_std_hema_list), 2)}")
 tables.append(mean_hema_table)
 
 # Create the PDF with multiple tables
