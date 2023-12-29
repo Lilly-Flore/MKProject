@@ -144,8 +144,10 @@ def plot_histogram(in_list, x_label, y_label):
 
         if 0.01 <= gap <= 0.01:
             bin_width = 0.001
+        elif 0.01 < gap <= 0.5:
+            bin_width = 0.005
         elif 0.1 < gap <= 2:
-            bin_width = 0.1
+            bin_width = 0.05
         elif 2 < gap <= 20:
             bin_width = 1
         elif 20 < gap <= 100:
@@ -161,7 +163,7 @@ def plot_histogram(in_list, x_label, y_label):
 
         # Display the histogram
         fig, ax = plt.subplots()
-        ax.hist(in_list, bins=num_bins, color='grey', edgecolor='darkgrey')
+        n, bins, patches = ax.hist(in_list, bins=num_bins, color='grey', edgecolor='darkgrey')
         ax.set_title(f"{x_label}{' distribution'}")
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
