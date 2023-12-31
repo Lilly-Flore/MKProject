@@ -30,6 +30,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import PyPDF2
 from PyPDF2 import PdfReader, PdfWriter
 from matplotlib.backends.backend_pdf import PdfPages
 from reportlab.lib import colors
@@ -370,9 +371,9 @@ with PdfPages(graphs_pdf) as pdf:
     min_diam_ratio_fig = plot_histogram(min_diam_ratio_list, 'Min diameter Ratio %', y_label_MK)
     pdf.savefig(min_diam_ratio_fig)
 
-    circularity_fig = plot_histogram(circularity_list, 'MK circularity µm', y_label_MK)
+    circularity_fig = plot_histogram(circularity_list, 'MK circularity', y_label_MK)
     pdf.savefig(circularity_fig)
-    nuc_circ_fig = plot_histogram(nuc_circ_list, 'Nuclei mean circularity µm', y_label_nuclei)
+    nuc_circ_fig = plot_histogram(nuc_circ_list, 'Nuclei mean circularity', y_label_nuclei)
     pdf.savefig(nuc_circ_fig)
     circ_ratio_fig = plot_histogram(circ_ratio_list, 'Circularity Ratio %', y_label_MK)
     pdf.savefig(circ_ratio_fig)
@@ -429,12 +430,12 @@ std_min_diam_table = create_table('MK min diameter std', 'Nuclei min diameter st
 tables.append(std_min_diam_table)
 
 mean_circularity_table = create_table('MK mean circularity', 'Nuclei mean circularity',
-                                      f"{round(np.mean(circularity_list), 2)} (µm)",
-                                      f"{round(np.mean(nuc_circ_list), 2)} (µm)")
+                                      round(np.mean(circularity_list), 2),
+                                      round(np.mean(nuc_circ_list), 2))
 tables.append(mean_circularity_table)
 std_circularity_table = create_table('MK circularity std', 'Nuclei circularity std',
-                                     f"{round(np.std(circularity_list), 2)} (µm)",
-                                     f"{round(np.std(nuc_circ_list), 2)} (µm)")
+                                     round(np.std(circularity_list), 2),
+                                     round(np.std(nuc_circ_list), 2))
 tables.append(std_circularity_table)
 
 mean_hema_table = create_table('MK mean hematoxylin', 'Nuclei mean hematoxylin', f"{round(np.mean(mean_hema_list), 2)}",
