@@ -24,7 +24,7 @@ pathObjects.each{ o ->
         num_nuclei = children.size() as double 
         o.measurements['Number of nuclei'] = num_nuclei   
     
-        nuc_area_px = children.collect{ it.getROI().getArea() }?.sum() / num_nuclei
+        nuc_area_px = children.collect{ it.getROI().getArea() }?.sum()
         nuc_min_diam_px = children.collect{ it.measurements['Min diameter µm'] }?.sum() / num_nuclei
         nuc_max_diam_px = children.collect{ it.measurements['Max diameter µm'] }?.sum() / num_nuclei
         nuc_circ_px = children.collect{ it.measurements['Circularity'] }?.sum() / num_nuclei
