@@ -401,7 +401,7 @@ with PdfPages(graphs_pdf) as pdf:
 tables_pdf = "Tables.pdf"
 tables = []
 
-number_table = create_table('Number of megakaryocytes', 'Number of nuclei', len(name_list), sum(num_nuclei_list))
+number_table = create_table('Number of megakaryocytes', 'Number of nuclei', len(name_list), int(sum(num_nuclei_list)))
 tables.append(number_table)
 
 mean_area_table = create_table('MK mean area', 'Nuclei mean area', f"{round(np.mean(area_list), 2)} (µm^2)",
