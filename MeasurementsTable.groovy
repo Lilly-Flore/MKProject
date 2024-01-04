@@ -24,7 +24,7 @@ pathObjects.each{ o ->
         num_nuclei = children.size() as double 
         o.measurements['Number of nuclei'] = num_nuclei   
     
-        nuc_area_px = children.collect{ it.getROI().getArea() }?.sum() / num_nuclei
+        nuc_area_px = children.collect{ it.getROI().getArea() }?.sum()
         nuc_min_diam_px = children.collect{ it.measurements['Min diameter µm'] }?.sum() / num_nuclei
         nuc_max_diam_px = children.collect{ it.measurements['Max diameter µm'] }?.sum() / num_nuclei
         nuc_circ_px = children.collect{ it.measurements['Circularity'] }?.sum() / num_nuclei
@@ -39,7 +39,7 @@ pathObjects.each{ o ->
         // Calculate area ratio
         def area_ratio = nuc_area_px / o.getROI().getArea() * 100
         o.measurements['Area Ratio %'] = area_ratio
-        o.measurements['Nuclei Area '+GeneralTools.micrometerSymbol()+'^2: Mean' ] = nuc_area_px * px * px
+        o.measurements['Nuclei Area '+GeneralTools.micrometerSymbol()+'^2: Mean' ] = (nuc_area_px / num_nuclei) * px * px
     }
     
     if(nuc_min_diam_px != null) {
