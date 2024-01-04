@@ -244,7 +244,7 @@ def create_pdf_with_tables(file_path, in_tables):
             content.append(table)
 
             # Add space (Spacer) between tables
-            content.append(Spacer(1, 12))  # Adjust the second parameter for the desired space
+            content.append(Spacer(1, 12))
 
         # Build the PDF document
         in_pdf.build(content)
