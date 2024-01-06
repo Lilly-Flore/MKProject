@@ -30,7 +30,6 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import PyPDF2
 from PyPDF2 import PdfReader, PdfWriter
 from matplotlib.backends.backend_pdf import PdfPages
 from reportlab.lib import colors
@@ -302,14 +301,13 @@ for index, row in df.iterrows():
     list_of_maps.append(row_map)
 
 columns_to_extract = ['Image', 'Object ID', 'Name', 'Number of nuclei',
-                      'Area µm^2', 'Area Ratio %', 'Nuclei Area µm^2: Mean',
-                      'Min diameter µm', 'Nuclei diameter µm: Mean Min', 'Diameter Ratio %: Min'
-                                                                         'Max diameter µm',
-                      'Nuclei diameter µm: Mean Max', 'Diameter Ratio %: Max',
-                      'Circularity', 'Nuclei Circularity µm: Mean', 'Circularity Ratio %',
+                      'Area µm^2', 'Area Ratio %', 'Nucleus Area µm^2: Mean',
+                      'Min diameter µm', 'Nucleus diameter µm: Mean Min', 'Diameter Ratio %: Min',
+                      'Max diameter µm', 'Nucleus diameter µm: Mean Max', 'Diameter Ratio %: Max',
+                      'Circularity', 'Nucleus Circularity µm: Mean', 'Circularity Ratio %',
                       'Hematoxylin: Mean', 'Hematoxylin: Min', 'Hematoxylin: Max',
-                      'Nuclei Hematoxylin: Max', 'Nuclei Hematoxylin: Min', 'Nuclei Hematoxylin: Mean',
-                      'Nuclei Hematoxylin: Std.Dev.'
+                      'Nucleus Hematoxylin: Max', 'Nucleus Hematoxylin: Min', 'Nucleus Hematoxylin: Mean',
+                      'Nucleus Hematoxylin: Std.Dev.'
                       ]
 
 # Creation of lists
