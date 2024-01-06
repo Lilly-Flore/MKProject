@@ -39,38 +39,38 @@ pathObjects.each{ o ->
         // Calculate area ratio
         def area_ratio = nuc_area_px / o.getROI().getArea() * 100
         o.measurements['Area Ratio %'] = area_ratio
-        o.measurements['Nuclei Area '+GeneralTools.micrometerSymbol()+'^2: Mean' ] = (nuc_area_px / num_nuclei) * px * px
+        o.measurements['Nucleus Area '+GeneralTools.micrometerSymbol()+'^2: Mean' ] = (nuc_area_px / num_nuclei) * px * px
     }
     
     if(nuc_min_diam_px != null) {
         // Calculate min diameter ratio
         def min_diam_ratio = nuc_min_diam_px / o.measurements['Min diameter µm'] * 100
         o.measurements['Diameter Ratio %: Min'] = min_diam_ratio
-        o.measurements['Nuclei diameter '+GeneralTools.micrometerSymbol()+ ': Mean Min' ] = nuc_min_diam_px //* px * px   
+        o.measurements['Nucleus diameter '+GeneralTools.micrometerSymbol()+ ': Mean Min' ] = nuc_min_diam_px * px * px   
     }
     if(nuc_max_diam_px != null) {
         // Calculate max diameter ratio
         def max_diam_ratio = nuc_max_diam_px / o.measurements['Max diameter µm'] * 100
         o.measurements['Diameter Ratio %: Max'] = max_diam_ratio
-        o.measurements['Nuclei diameter '+GeneralTools.micrometerSymbol()+ ': Mean Max' ] = nuc_max_diam_px * px * px      
+        o.measurements['Nucleus diameter '+GeneralTools.micrometerSymbol()+ ': Mean Max' ] = nuc_max_diam_px * px * px      
     }    
     if(nuc_max_diam_px != null) {
         // Calculate circularity ratio
         def circ_ratio = nuc_circ_px / o.measurements['Circularity'] * 100
         o.measurements['Circularity Ratio %'] = circ_ratio
-        o.measurements['Nuclei Circularity '+GeneralTools.micrometerSymbol()+ ': Mean' ] = nuc_circ_px * px * px
+        o.measurements['Nucleus Circularity '+GeneralTools.micrometerSymbol()+ ': Mean' ] = nuc_circ_px * px * px
     }
     if(nuc_min_hema != null) {
-        o.measurements['Nuclei Hematoxylin: Min'] = nuc_min_hema
+        o.measurements['Nucleus Hematoxylin: Min'] = nuc_min_hema
     }
     if(nuc_max_hema != null) {
-        o.measurements['Nuclei Hematoxylin: Max'] = nuc_max_hema
+        o.measurements['Nucleus Hematoxylin: Max'] = nuc_max_hema
     }
     if(nuc_mean_hema != null) {
-        o.measurements['Nuclei Hematoxylin: Mean'] = nuc_max_hema
+        o.measurements['Nucleus Hematoxylin: Mean'] = nuc_max_hema
     }
     if(nuc_std_hema != null) {
-        o.measurements['Nuclei Hematoxylin: Std.Dev.'] = nuc_max_hema
+        o.measurements['Nucleus Hematoxylin: Std.Dev.'] = nuc_max_hema
     }
 }
 println('Done!')
