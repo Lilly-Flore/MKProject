@@ -317,28 +317,28 @@ name_list = df['Name'].tolist()
 num_nuclei_list = filter_list(df['Number of nuclei'].tolist())
 
 area_list = filter_list(df['Area µm^2'].tolist())
-nuc_area_list = filter_list(df['Nuclei Area µm^2: Mean'].tolist())
+nuc_area_list = filter_list(df['Nucleus Area µm^2: Mean'].tolist())
 area_ratio_list = filter_list(df['Area Ratio %'].tolist())
 
 max_diameter_list = filter_list(df['Max diameter µm'].tolist())
-nuc_max_diam_list = filter_list(df['Nuclei diameter µm: Mean Max'].tolist())
+nuc_max_diam_list = filter_list(df['Nucleus diameter µm: Mean Max'].tolist())
 max_diam_ratio_list = filter_list(df['Diameter Ratio %: Max'].tolist())
 
 min_diameter_list = filter_list(df['Min diameter µm'].tolist())
-nuc_min_diam_list = filter_list(df['Nuclei diameter µm: Mean Min'].tolist())
+nuc_min_diam_list = filter_list(df['Nucleus diameter µm: Mean Min'].tolist())
 min_diam_ratio_list = filter_list(df['Diameter Ratio %: Min'].tolist())
 
 circularity_list = filter_list(df['Circularity'].tolist())
-nuc_circ_list = filter_list(df['Nuclei Circularity µm: Mean'].tolist())
+nuc_circ_list = filter_list(df['Nucleus Circularity µm: Mean'].tolist())
 circ_ratio_list = filter_list(df['Circularity Ratio %'].tolist())
 
 min_hema_list = filter_list(df['Hematoxylin: Min'].tolist())
 max_hema_list = filter_list(df['Hematoxylin: Max'].tolist())
 mean_hema_list = filter_list(df['Hematoxylin: Mean'].tolist())
-nuc_min_hema_list = filter_list(df['Nuclei Hematoxylin: Min'].tolist())
-nuc_max_hema_list = filter_list(df['Nuclei Hematoxylin: Max'].tolist())
-nuc_mean_hema_list = filter_list(df['Nuclei Hematoxylin: Mean'].tolist())
-nuc_std_hema_list = filter_list(df['Nuclei Hematoxylin: Std.Dev.'].tolist())
+nuc_min_hema_list = filter_list(df['Nucleus Hematoxylin: Min'].tolist())
+nuc_max_hema_list = filter_list(df['Nucleus Hematoxylin: Max'].tolist())
+nuc_mean_hema_list = filter_list(df['Nucleus Hematoxylin: Mean'].tolist())
+nuc_std_hema_list = filter_list(df['Nucleus Hematoxylin: Std.Dev.'].tolist())
 
 # Create pdf file
 graphs_pdf = "Graphs.pdf"
